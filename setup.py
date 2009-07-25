@@ -10,7 +10,7 @@ README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 setup(name='jingle',
-      version='0.1',
+      version='0.1dev',
       description='jingle',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
