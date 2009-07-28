@@ -2,7 +2,8 @@ from repoze.bfg.view import static, bfg_view
 from jinja2 import Environment, PackageLoader
 from webob import Response
 
-from models import Page
+from jingle.config import DEFAULT_PAGE_BEHAVIOUR
+from models import Root, Page
 
 def render_properties_to_jinja(template, properties):
     output = []

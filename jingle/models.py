@@ -4,6 +4,8 @@ from persistent.mapping import PersistentMapping
 from persistent.dict import PersistentDict
 import schemas
 
+from jingle import config
+
 class Page(Persistent):
     __name__ = None
     __parent__ = None
@@ -13,7 +15,7 @@ class Page(Persistent):
     
     layout_template = u''
     
-    _default_behaviour = ('page',)
+    _default_behaviour = config['DEFAULT_PAGE_BEHAVIOUR']
     extra_behaviour = []
     
     def __init__(self, title):
