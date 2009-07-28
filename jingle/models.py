@@ -5,6 +5,7 @@ from persistent.dict import PersistentDict
 import schemas
 
 from jingle import config
+from jingle.utils import normalise_title
 
 class Page(Persistent):
     __name__ = None
@@ -20,7 +21,7 @@ class Page(Persistent):
     
     def __init__(self, title):
         self.title = title
-        self.__name__ = title.lower().replace(' ', '_')
+        self.__name__ = normalise_title(title)
         self._properties = PersistentDict({})
         self._update_properties()
     
