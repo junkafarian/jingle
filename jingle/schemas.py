@@ -5,6 +5,13 @@ import sys
 
 registry = Registry()
 
+# def register_schema(*behaviours):
+#     def wrapped(context):
+#         for behaviour in behaviours:
+#             registry.register(behaviour, context)
+#         return context
+#     return wrapped
+
 class Schema(formencode.Schema):
     """ Augmented `formencode.Schema` object to provide the ability to process
         multiple forms by restricting the validated data to keys beginning
@@ -47,11 +54,12 @@ class Schema(formencode.Schema):
     
 
 
+#@register_schema('page')
 class Page(Schema):
     title = UnicodeString(default=u'',
                           not_empty=True)
     content = UnicodeString(default=u'',
                             not_empty=True)
 
-registry.register('page', Page)
+registry.register('page', Page())
 
