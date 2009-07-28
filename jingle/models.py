@@ -45,11 +45,11 @@ class Page(Persistent):
         self._update_properties()
         return dict(self._properties)
     
-    def update(self, key, data):
+    def update(self, key, data, prefix=''):
         if key not in self.behaviour:
             return dict(self._properties)
         schema = schemas.registry.lookup(key)
-        formatted = schema.to_python(data)
+        formatted = schema.validate(data, prefix=prefix)
         for k,v in formatted.items():
             self._properties['%s.%s' % (key, k)] = v
         return self._properties
