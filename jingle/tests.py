@@ -2,33 +2,6 @@ import unittest
 
 from repoze.bfg import testing
 
-class ViewTests(unittest.TestCase):
-
-    """ These tests are unit tests for the view.  They test the
-    functionality of *only* the view.  They register and use dummy
-    implementations of repoze.bfg functionality to allow you to avoid
-    testing 'too much'"""
-
-    def setUp(self):
-        """ cleanUp() is required to clear out the application registry
-        between tests (done in setUp for good measure too)
-        """
-        testing.cleanUp()
-        
-    def tearDown(self):
-        """ cleanUp() is required to clear out the application registry
-        between tests
-        """
-        testing.cleanUp()
-
-    def test_my_view(self):
-        from largebluejingle.views import my_view
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/mytemplate.pt')
-        response = my_view(context, request)
-        renderer.assert_(project='largeblue.jingle')
-
 class ViewIntegrationTests(unittest.TestCase):
     """ These tests are integration tests for the view.  These test
     the functionality the view *and* its integration with the rest of
@@ -48,26 +21,48 @@ class ViewIntegrationTests(unittest.TestCase):
         (including dependent registrations for repoze.bfg itself).
         """
         testing.cleanUp()
-        import largebluejingle
+        import jingle
         import zope.configuration.xmlconfig
         zope.configuration.xmlconfig.file('configure.zcml',
-                                          package=largebluejingle)
+                                          package=jingle)
 
     def tearDown(self):
         """ Clear out the application registry """
         testing.cleanUp()
 
-    def test_my_view(self):
-        from largebluejingle.views import my_view
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
-        result = my_view(context, request)
-        self.assertEqual(result.status, '200 OK')
-        body = result.app_iter[0]
-        self.failUnless('Welcome to' in body)
-        self.assertEqual(len(result.headerlist), 2)
-        self.assertEqual(result.headerlist[0],
-                         ('Content-Type', 'text/html; charset=UTF-8'))
-        self.assertEqual(result.headerlist[1], ('Content-Length',
-                                                str(len(body))))
+#     def test_my_view(self):
+#         from jingle.views import view_page
+#         context = testing.DummyModel()
+#         request = testing.DummyRequest()
+#         result = view_page(context, request)
+#         self.assertEqual(result.status, '200 OK')
+#         body = result.app_iter[0]
+#         self.failUnless('Welcome to' in body)
+#         self.assertEqual(len(result.headerlist), 2)
+#         self.assertEqual(result.headerlist[0],
+#                          ('Content-Type', 'text/html; charset=UTF-8'))
+#         self.assertEqual(result.headerlist[1], ('Content-Length',
+#                                                 str(len(body))))
+
+class InternalFunctionalTests(unittest.TestCase):
+    def setUp(self):
+        """ This sets up the application registry with the
+        registrations your application declares in its configure.zcml
+        (including dependent registrations for repoze.bfg itself).
+        """
+        testing.cleanUp()
+        import jingle
+        import zope.configuration.xmlconfig
+        zope.configuration.xmlconfig.file('configure.zcml',
+                                          package=jingle)
+    
+    def tearDown(self):
+        """ Clear out the application registry """
+        testing.cleanUp()
+    
+    def test_schema_registration(self):
+        from jingle.schemas import Schema
+        from jingle.schemas import registry
+
+
 
