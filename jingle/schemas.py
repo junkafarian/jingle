@@ -12,6 +12,9 @@ registry = Registry()
 #         return context
 #     return wrapped
 
+class InvalidSchema(Exception):
+    pass
+
 class Schema(formencode.Schema):
     """ Augmented `formencode.Schema` object to provide the ability to process
         multiple forms by restricting the validated data to keys beginning

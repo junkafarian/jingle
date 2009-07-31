@@ -2,6 +2,7 @@ from formencode import Invalid
 from persistent import Persistent
 from persistent.mapping import PersistentMapping
 from persistent.dict import PersistentDict
+from persistent.list import PersistentList
 import schemas
 
 from jingle import config
@@ -17,20 +18,62 @@ class Page(Persistent):
     layout_template = u''
     
     _default_behaviour = config['DEFAULT_PAGE_BEHAVIOUR']
-    extra_behaviour = []
     
     def __init__(self, title):
         self.title = title
         self.__name__ = normalise_title(title)
         self._properties = PersistentDict({})
+        self._extra_behaviour = PersistentList([])
+        
         self._update_properties()
+    
+    ### Behaviour ###
     
     @property
     def behaviour(self):
-        behaviour = []
-        behaviour.extend(self._default_behaviour)
-        behaviour.extend(self.extra_behaviour)
-        return behaviour
+        """ Collates the default and user-added behaviour into a list
+            
+            >>> page = Page('test')
+            >>> page.behaviour == list(page._default_behaviour) + list(page._extra_behaviour)
+            True
+        """
+        return list(self._default_behaviour) + list(self._extra_behaviour)
+    
+    def add_behaviour(self, key, data=None, prefix=''):
+        """ Adds additional behaviour as defined by a Schema object
+            
+            >>> page = Page('test')
+            >>> page.add_behaviour('test')
+            Traceback (most recent call last):
+            ...
+            InvalidSchema: There is no Schema registered to provide `test`
+            >>> from jingle.schemas import registry, Schema
+            >>> from formencode.validators import UnicodeString
+            >>> class TestSchema(Schema):
+            ...     title = UnicodeString(default=u'',
+            ...                           not_empty=True)
+            >>> registry.register('test', TestSchema())
+            >>> page.add_behaviour('test')
+            ['page', 'test']
+            
+        """
+        if key not in schemas.registry:
+            raise schemas.InvalidSchema('There is no Schema registered to provide `%s`' % key)
+        elif key not in self.behaviour:
+            self._extra_behaviour.append(key)
+            self._update_properties()
+            if data is not None:
+                return self.update(key, data, prefix)
+        return self.behaviour
+    
+    def remove_behaviour(self, key):
+        if key in self._extra_behaviour:
+            self._extra_behaviour.remove(key)
+        elif key in self._default_behaviour:
+            raise Exception('Cannot remove default behaviour')
+        return self.behaviour
+    
+    ### Properties ###
     
     def _update_properties(self):
         for behaviour in self.behaviour:
@@ -55,6 +98,8 @@ class Page(Persistent):
             self._properties['%s.%s' % (key, k)] = v
         return self._properties
     
+    
+    ### Navigation / Hierarchy ###
     
     def add_child(self, child):
         """ This method will process setting / syncing the __parent__ and children attributes
