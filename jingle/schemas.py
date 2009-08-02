@@ -12,7 +12,12 @@ registry = Registry()
 #         return context
 #     return wrapped
 
+### Exceptions ###
+
 class InvalidSchema(Exception):
+    """ A marker exception for Schemas which are not stored in the registry,
+        or do not provide required behaviour.
+    """
     pass
 
 class Schema(formencode.Schema):
