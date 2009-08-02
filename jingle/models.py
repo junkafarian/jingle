@@ -84,11 +84,58 @@ class Page(Persistent):
                 return self.update(key, data, prefix)
         return self.behaviour
     
-    def remove_behaviour(self, key):
+    def remove_behaviour(self, key, remove_properties=False):
+        """ Removes additional behaviour.
+            
+            We can't remove behaviour that isn't there:
+            
+                >>> page = Page('test')
+                >>> page.behaviour == page.remove_behaviour('test')
+                True
+            
+            We also cannot delete default behaviour:
+            
+                >>> page.remove_behaviour('page')
+                Traceback (most recent call last):
+                ...
+                Exception: Cannot remove default behaviour
+            
+            We can delete extra behaviour however:
+            
+                >>> from jingle.schemas import registry, Schema
+                >>> from formencode.validators import UnicodeString
+                >>> class TestSchema(Schema):
+                ...     title = UnicodeString(default=u'',
+                ...                           not_empty=True)
+                >>> registry.register('test', TestSchema())
+                >>> page.add_behaviour('test')
+                ['page', 'test']
+                >>> page.remove_behaviour('test')
+                ['page']
+            
+            This will leave the schema values behind in the properties store
+            in an attempt to userproof data deletion.
+            
+                >>> 'test.title' in page.properties
+                True
+            
+            We can delete these values though:
+            
+                >>> page.remove_behaviour('test', remove_properties=True)
+                ['page']
+                >>> 'test.title' in page.properties
+                False
+            
+        """
         if key in self._extra_behaviour:
             self._extra_behaviour.remove(key)
         elif key in self._default_behaviour:
             raise Exception('Cannot remove default behaviour')
+        if remove_properties: # delete keys and values from the property store
+            for k in self._properties.keys():
+                if k.startswith('%s.' % key):
+                    del self._properties[k]
+            
         return self.behaviour
     
     ### Properties ###
