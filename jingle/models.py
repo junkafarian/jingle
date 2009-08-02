@@ -114,7 +114,7 @@ class Page(Persistent):
         formatted = schema.validate(data, prefix=prefix)
         for k,v in formatted.items():
             self._properties['%s.%s' % (key, k)] = v
-        return self._properties
+        return dict(self._properties)
     
     
     ### Navigation / Hierarchy ###
