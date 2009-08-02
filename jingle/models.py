@@ -33,28 +33,46 @@ class Page(Persistent):
     def behaviour(self):
         """ Collates the default and user-added behaviour into a list
             
-            >>> page = Page('test')
-            >>> page.behaviour == list(page._default_behaviour) + list(page._extra_behaviour)
-            True
+                >>> page = Page('test')
+                >>> page.behaviour == list(page._default_behaviour) + list(page._extra_behaviour)
+                True
         """
         return list(self._default_behaviour) + list(self._extra_behaviour)
     
     def add_behaviour(self, key, data=None, prefix=''):
-        """ Adds additional behaviour as defined by a Schema object
+        """ Adds additional behaviour as defined by a Schema object.
             
-            >>> page = Page('test')
-            >>> page.add_behaviour('test')
-            Traceback (most recent call last):
-            ...
-            InvalidSchema: There is no Schema registered to provide `test`
-            >>> from jingle.schemas import registry, Schema
-            >>> from formencode.validators import UnicodeString
-            >>> class TestSchema(Schema):
-            ...     title = UnicodeString(default=u'',
-            ...                           not_empty=True)
-            >>> registry.register('test', TestSchema())
-            >>> page.add_behaviour('test')
-            ['page', 'test']
+            We can't extend the page with behaviour that isn't provided for in the registry:
+            
+                >>> page = Page('test')
+                >>> page.add_behaviour('test')
+                Traceback (most recent call last):
+                ...
+                InvalidSchema: There is no Schema registered to provide `test`
+            
+            We must add the schema to the registry first:
+            
+                >>> from jingle.schemas import registry, Schema
+                >>> from formencode.validators import UnicodeString
+                >>> class TestSchema(Schema):
+                ...     title = UnicodeString(default=u'',
+                ...                           not_empty=True)
+                >>> registry.register('test', TestSchema())
+                >>> page.add_behaviour('test')
+                ['page', 'test']
+            
+            We can also pass some initial data in rather than having to make another call to update():
+            
+                >>> page2 = Page('test2')
+                >>> page2.update('test', {'title':u'Page 2'}) # doctest: +ELLIPSIS
+                {...}
+                >>> 'test.title' in page2.properties
+                False
+                >>> page2.add_behaviour('test', {'title':u'Page 2'}) # doctest: +ELLIPSIS
+                {...}
+                >>> 'test.title' in page2.properties and page2.properties['test.title'] == u'Page 2'
+                True
+            
             
         """
         if key not in schemas.registry:
