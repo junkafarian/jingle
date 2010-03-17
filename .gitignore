@@ -1,4 +1,4 @@
 *.pyc
 *.#*
-jingle.egg_info/*
+jingle.egg-info/*
 var/Data.fs*
