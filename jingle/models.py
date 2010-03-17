@@ -55,9 +55,9 @@ class Page(Persistent):
                 >>> from jingle.schemas import registry, Schema
                 >>> from formencode.validators import UnicodeString
                 >>> class TestSchema(Schema):
+                ...     behaviour = 'test'
                 ...     title = UnicodeString(default=u'',
                 ...                           not_empty=True)
-                >>> registry.register('test', TestSchema())
                 >>> page.add_behaviour('test')
                 ['page', 'test']
             
@@ -105,9 +105,9 @@ class Page(Persistent):
                 >>> from jingle.schemas import registry, Schema
                 >>> from formencode.validators import UnicodeString
                 >>> class TestSchema(Schema):
+                ...     behaviour = 'test'
                 ...     title = UnicodeString(default=u'',
                 ...                           not_empty=True)
-                >>> registry.register('test', TestSchema())
                 >>> page.add_behaviour('test')
                 ['page', 'test']
                 >>> page.remove_behaviour('test')

@@ -1,5 +1,6 @@
 import formencode
 from formencode.validators import UnicodeString
+from formencode.declarative import DeclarativeMeta
 from repoze.component import Registry
 import sys
 
@@ -20,6 +21,15 @@ class InvalidSchema(Exception):
     """
     pass
 
+class SchemaMeta(DeclarativeMeta):
+    def __new__(meta, name, bases, attrs):
+        cls = DeclarativeMeta.__new__(meta, name, bases, attrs)
+        behaviour = attrs.get('behaviour')
+        if behaviour is None:
+            raise InvalidSchema('A Schema must provide some behaviour')
+        registry.register(behaviour, cls())
+        return cls
+
 class Schema(formencode.Schema):
     """ Augmented `formencode.Schema` object to provide the ability to process
         multiple forms by restricting the validated data to keys beginning
@@ -27,6 +37,7 @@ class Schema(formencode.Schema):
         
         >>> from formencode.validators import UnicodeString
         >>> class TestSchema(Schema):
+        ...     behaviour = 'test'
         ...     title = UnicodeString(default=u'',
         ...                           not_empty=True)
         >>> s = TestSchema()
@@ -53,6 +64,10 @@ class Schema(formencode.Schema):
         
     """
     
+    __metaclass__ = SchemaMeta
+    
+    behaviour = 'none'
+    
     allow_extra_fields = True
     filter_extra_fields = True
     
@@ -64,10 +79,11 @@ class Schema(formencode.Schema):
 
 #@register_schema('page')
 class Page(Schema):
+    behaviour = 'page'
+    
     title = UnicodeString(default=u'',
                           not_empty=True)
     content = UnicodeString(default=u'',
                             not_empty=True)
 
-registry.register('page', Page())
 
