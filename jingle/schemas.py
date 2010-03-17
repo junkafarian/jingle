@@ -6,13 +6,6 @@ import sys
 
 registry = Registry()
 
-# def register_schema(*behaviours):
-#     def wrapped(context):
-#         for behaviour in behaviours:
-#             registry.register(behaviour, context)
-#         return context
-#     return wrapped
-
 ### Exceptions ###
 
 class InvalidSchema(Exception):
@@ -77,7 +70,6 @@ class Schema(formencode.Schema):
     
 
 
-#@register_schema('page')
 class Page(Schema):
     behaviour = 'page'
     
