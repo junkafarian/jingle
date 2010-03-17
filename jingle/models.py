@@ -168,9 +168,26 @@ class Page(Persistent):
     
     def add_child(self, child):
         """ This method will process setting / syncing the __parent__ and children attributes
+            
+            Adding a child page should add a reference to the children attribute:
+            
+                >>> parent = Page('Parent')
+                >>> child = Page('Child')
+                >>> parent.add_child(child)
+                [u'child']
+                >>> child.__parent__ == parent.__name__
+                True
+            
+            However, children must be Pages too:
+            
+                >>> parent.add_child(object())
+                Traceback (most recent call last):
+                ...
+                TypeError: Children must be inherited from the Page class, not <type 'object'>
+                
         """
         if not isinstance(child, Page):
-            raise TypeError('Children must be inherited from the Page class, not %s' % type(child))
+            raise TypeError('Children must be inherited from the Page class, not %s' % str(type(child)))
         self.__children__.append(child.__name__)
         child.__parent__ = self.__name__
         return self.__children__
