@@ -1,6 +1,8 @@
 from repoze.bfg.view import static, bfg_view
+from repoze.bfg.url import model_url
 from jinja2 import Environment, PackageLoader
 from webob import Response
+from webob.exc import HTTPFound
 
 from models import Root, Page
 
@@ -28,7 +30,8 @@ def create_page_post(context, request):
     for behaviour in data.getall('behaviour'):
         page.update(behaviour, data, behaviour + '.')
     context[data['uid']] = page
-    return Response('Successfully Updated')
+    location = model_url(page, request)
+    return HTTPFound(location = location)
 
 @bfg_view(for_=Page)
 def view_page(context, request):
