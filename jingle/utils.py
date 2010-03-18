@@ -9,11 +9,17 @@ def normalise_title(title):
     """
     return unicode(title.lower().replace(' ', '_'))
 
-def add_dict_prefix(prefix, original_data):
-    data = {}
-    for k,v in original_data.items():
-        data['%s%s' % (prefix,k)] = v
-    return data
+def add_dict_prefix(prefix, data):
+    """ Adds `prefix` to all keys in `original_data`.
+        
+            >>> i = {'foo': 1, 'bar': 2}
+            >>> add_dict_prefix('prefix.', i)
+            {'prefix.foo': 1, 'prefix.bar': 2}
+    """
+    new_data = {}
+    for k,v in data.items():
+        new_data['%s%s' % (prefix,k)] = v
+    return new_data
 
 def remove_dict_prefix(prefix, original_data):
     new_value_dict = MultiDict()
