@@ -18,10 +18,13 @@ def app(global_config, **kw):
     """
     # paster app config callback
     import jingle
-    from jingle.models import appmaker
+    from jingle.models import AppMaker
     zodb_uri = kw.get('zodb_uri')
     if zodb_uri is None:
         raise ValueError("No 'zodb_uri' in application configuration.")
-
+    
+    zodb_base = kw.get('zodb_base', 'root')
+    
+    appmaker = AppMaker(zodb_base)
     get_root = PersistentApplicationFinder(zodb_uri, appmaker)
     return make_app(get_root, jingle, options=kw)

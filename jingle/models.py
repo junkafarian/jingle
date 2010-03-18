@@ -202,15 +202,19 @@ class Root(PersistentMapping):
         super(Root, self).__setitem__(name, value)
     
 
-def appmaker(zodb_root):
-    if not 'root' in zodb_root:
-        from data import page_defaults
-        app_root = Root()
-        home = Page('Home')
-        home.layout_template = u'master.html'
-        home.update('page', page_defaults.get('home', {'title': u'Home'}))
-        app_root['home'] = home
-        zodb_root['root'] = app_root
-        import transaction
-        transaction.commit()
-    return zodb_root['root']
+class AppMaker:
+    def __init__(self, base):
+        self.base = base
+    
+    def __call__(self, zodb_root, reset=False):
+        if reset or self.base not in zodb_root:
+            from data import page_defaults
+            app_root = Root()
+            home = Page('Home')
+            home.layout_template = u'master.html'
+            home.update('page', page_defaults.get('home', {'title': u'Home'}))
+            app_root['home'] = home
+            zodb_root[self.base] = app_root
+            import transaction
+            transaction.commit()
+        return zodb_root[self.base]

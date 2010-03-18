@@ -17,5 +17,27 @@ class InternalFunctionalTests(unittest.TestCase):
         self.failUnless('title' in registry.lookup('test').fields)
         
 
+from nose.tools import assert_true, with_setup
+from webtest import TestApp
+from os.path import dirname, join
+
+config_path = join(dirname(dirname(__file__)), 'etc', 'test.ini')
+app = TestApp('config:' + config_path)
+registry = app.app.application.application.registry
+
+def test_reset_root():
+    from repoze.bfg.interfaces import ISettings
+    settings = registry.getUtility(ISettings)
+    
+    from repoze.zodbconn.finder import PersistentApplicationFinder
+    from jingle.models import AppMaker, Root
+    get_root = PersistentApplicationFinder(settings.get('zodb_uri'), lambda x: AppMaker('test')(x, reset=True))
+    environ = {}
+    root = get_root(environ)
+    assert_true(
+        isinstance(root, Root),
+        u'root object should be a Root() object'
+    )
+    del environ
 
 
