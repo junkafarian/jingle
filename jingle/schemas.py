@@ -28,32 +28,46 @@ class Schema(formencode.Schema):
         multiple forms by restricting the validated data to keys beginning
         with the `prefix` attribute.
         
-        >>> from formencode.validators import UnicodeString
-        >>> class TestSchema(Schema):
-        ...     behaviour = 'test'
-        ...     title = UnicodeString(default=u'',
-        ...                           not_empty=True)
-        >>> s = TestSchema()
-        >>> s.to_python({})
-        Traceback (most recent call last):
-        ...
-        Invalid: title: Missing value
-        >>> s.validate({})
-        Traceback (most recent call last):
-        ...
-        Invalid: title: Missing value
-        >>> s.to_python({'title':u'Test Title'})
-        {'title': u'Test Title'}
-        >>> s.validate({'title': u'Test Title'})
-        {'title': u'Test Title'}
-        >>> s.validate({'title':u'Test Title', 'extra_field':u'A field not in the schema'})
-        {'title': u'Test Title'}
-        >>> s.to_python({'test.title':u'Test Title', 'test.extra_field':u'A field not in the schema'})
-        Traceback (most recent call last):
-        ...
-        Invalid: title: Missing value
-        >>> s.validate({'test.title':u'Test Title', 'test.extra_field':u'A field not in the schema'}, prefix='test.')
-        {'title': u'Test Title'}
+        Schemas must define which behaviour they provide::
+        
+            >>> from formencode.validators import UnicodeString
+            >>> class TestSchemaNoBehaviour(Schema):
+            ...     title = UnicodeString()
+            Traceback (most recent call last):
+            ...
+            InvalidSchema: A Schema must provide some behaviour
+        
+        Once configured, they behave like regular formencode.Shema() objects
+        
+            >>> class TestSchema(Schema):
+            ...     behaviour = 'test'
+            ...     title = UnicodeString(default=u'',
+            ...                           not_empty=True)
+            >>> s = TestSchema()
+            >>> s.to_python({})
+            Traceback (most recent call last):
+            ...
+            Invalid: title: Missing value
+            >>> s.validate({})
+            Traceback (most recent call last):
+            ...
+            Invalid: title: Missing value
+            >>> s.to_python({'title':u'Test Title'})
+            {'title': u'Test Title'}
+            >>> s.validate({'title': u'Test Title'})
+            {'title': u'Test Title'}
+            >>> s.validate({'title':u'Test Title', 'extra_field':u'A field not in the schema'})
+            {'title': u'Test Title'}
+        
+        It is also possible to process prefixed data dictionaries.
+        (Useful for POSTs with multiple forms)
+        
+            >>> s.to_python({'test.title':u'Test Title', 'test.extra_field':u'A field not in the schema'})
+            Traceback (most recent call last):
+            ...
+            Invalid: title: Missing value
+            >>> s.validate({'test.title':u'Test Title', 'test.extra_field':u'A field not in the schema'}, prefix='test.')
+            {'title': u'Test Title'}
         
     """
     
