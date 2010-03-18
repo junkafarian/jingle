@@ -2,3 +2,4 @@
 *.#*
 jingle.egg-info/*
 var/Data.fs*
+.coverage
