@@ -22,10 +22,13 @@ def create_page_get(context, request):
 
 @bfg_view(for_=Root, request_type='POST')
 def create_page_post(context, request):
-    home = Page('Home')
-    home.layout_template = u'master.html'
-    home.update('page', page_defaults.get('home', {'title': u'Home'}))
-    return Response(template.render())
+    data = request.POST
+    page = Page(data['title'])
+    page.layout_template = u'master.html'
+    for behaviour in data.getall('behaviour'):
+        page.update(behaviour, data, behaviour + '.')
+    context[data['uid']] = page
+    return Response('Successfully Updated')
 
 @bfg_view(for_=Page)
 def view_page(context, request):
