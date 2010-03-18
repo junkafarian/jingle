@@ -158,7 +158,7 @@ class Page(Persistent):
         if key not in self.behaviour:
             return dict(self._properties)
         schema = schemas.registry.lookup(key)
-        formatted = schema.validate(data, prefix=prefix)
+        formatted = schema.to_python(data, prefix=prefix)
         for k,v in formatted.items():
             self._properties['%s.%s' % (key, k)] = v
         return dict(self._properties)

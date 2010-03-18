@@ -48,15 +48,15 @@ class Schema(formencode.Schema):
             Traceback (most recent call last):
             ...
             Invalid: title: Missing value
-            >>> s.validate({})
+            >>> s.to_python({})
             Traceback (most recent call last):
             ...
             Invalid: title: Missing value
             >>> s.to_python({'title':u'Test Title'})
             {'title': u'Test Title'}
-            >>> s.validate({'title': u'Test Title'})
+            >>> s.to_python({'title': u'Test Title'})
             {'title': u'Test Title'}
-            >>> s.validate({'title':u'Test Title', 'extra_field':u'A field not in the schema'})
+            >>> s.to_python({'title':u'Test Title', 'extra_field':u'A field not in the schema'})
             {'title': u'Test Title'}
         
         It is also possible to process prefixed data dictionaries.
@@ -66,7 +66,7 @@ class Schema(formencode.Schema):
             Traceback (most recent call last):
             ...
             Invalid: title: Missing value
-            >>> s.validate({'test.title':u'Test Title', 'test.extra_field':u'A field not in the schema'}, prefix='test.')
+            >>> s.to_python({'test.title':u'Test Title', 'test.extra_field':u'A field not in the schema'}, prefix='test.')
             {'title': u'Test Title'}
         
     """
@@ -78,9 +78,9 @@ class Schema(formencode.Schema):
     allow_extra_fields = True
     filter_extra_fields = True
     
-    def validate(self, value_dict, state=None, prefix=''):
-        new_value_dict = dict([(k.replace(prefix,''),unicode(v)) for k,v in value_dict.items() if k.startswith(prefix)])
-        return self.to_python(new_value_dict, state)
+    def to_python(self, value_dict, state=None, prefix=''):
+        from jingle.utils import remove_dict_prefix
+        return super(Schema, self).to_python(remove_dict_prefix(prefix, value_dict), state)
     
 
 
