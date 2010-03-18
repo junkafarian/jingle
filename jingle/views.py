@@ -20,7 +20,7 @@ static_view = static('static')
 def create_page_get(context, request):
     return Response()
 
-@bfg_view(for_=Root)
+@bfg_view(for_=Root, request_type='POST')
 def create_page_post(context, request):
     home = Page('Home')
     home.layout_template = u'master.html'
