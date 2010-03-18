@@ -2,6 +2,6 @@
 
   <!-- this must be included for the view declarations to work -->
   <include package="repoze.bfg.includes" />
-  <scan package="." />
+  <scan package=".views" />
 
 </configure>
