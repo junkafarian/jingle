@@ -17,7 +17,7 @@ class InternalFunctionalTests(unittest.TestCase):
         self.failUnless('title' in registry.lookup('test').fields)
         
 
-from nose.tools import assert_true, with_setup
+from nose.tools import assert_true #, with_setup
 from webtest import TestApp
 from os.path import dirname, join
 
@@ -40,4 +40,24 @@ def test_reset_root():
     )
     del environ
 
+def test_add_page():
+    res = app.get('/')
+    
+    assert_true(
+        'Add page' in res.body,
+        u'we should be able to add a page')
+    
+    form = res.form
+    form['uid'] = 'new_page'
+    form['title'] = 'New Page'
+    form['behaviour'] = 'page'
+    form['page.title'] = 'New Page Title'
+    form['page.content'] = 'New Page Content'
+    form.submit()
+    
+    res = app.get('/new_page')
+    
+    assert_true(
+        'New Page Title' in res.body,
+        u'We should be redirected to new page')
 
